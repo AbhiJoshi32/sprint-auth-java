@@ -1,4 +1,8 @@
 drop table if exists oauth_client_details;
+drop TABLE IF EXISTS user_role;
+drop TABLE if EXISTS users;
+drop TABLE IF EXISTS role;
+
 create table oauth_client_details (
   client_id VARCHAR(255) PRIMARY KEY,
   resource_ids VARCHAR(255),
@@ -64,6 +68,14 @@ create table if not exists ClientDetails (
   autoApproveScopes VARCHAR(255)
 );
 
+
+CREATE TABLE IF NOT EXISTS role
+(
+  role_id integer NOT NULL,
+  role_name character varying(50) NOT NULL,
+  CONSTRAINT role_pkey PRIMARY KEY (role_id)
+);
+
 CREATE TABLE if not exists users
 (
   user_id integer NOT NULL,
@@ -100,11 +112,4 @@ CREATE TABLE if NOT EXISTS user_role
   REFERENCES users (user_id) MATCH SIMPLE
   ON UPDATE NO ACTION
   ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS role
-(
-  role_id integer NOT NULL,
-  role_name character varying(50) NOT NULL,
-  CONSTRAINT role_pkey PRIMARY KEY (role_id)
 );
