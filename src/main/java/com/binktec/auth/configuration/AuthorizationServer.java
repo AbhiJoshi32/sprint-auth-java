@@ -4,7 +4,10 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -22,6 +25,15 @@ import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 @Configuration
 @EnableAuthorizationServer
 public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
+    @Autowired
+    private Environment env;
+    @Value("classpath:schema.sql")
+    private Resource schemaScript;
+
+    @Value("classpath:data.sql")
+    private Resource dataScript;
+
+
     private final DataSource dataSource;
 
     private final AuthenticationManager authenticationManager;
@@ -72,6 +84,8 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
 
     private DatabasePopulator databasePopulator() {
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+        populator.addScript(schemaScript);
+        populator.addScript(dataScript);
         return populator;
     }
 
