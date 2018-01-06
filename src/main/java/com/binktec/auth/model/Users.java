@@ -23,9 +23,9 @@ public class Users implements Serializable {
     private int active;
     @Column(name = "is_verified")
     private Boolean isVerified;
-    @Column(name="phone")
+    @Column(name="phone",nullable = true)
     private String phone;
-    @Column(name="address")
+    @Column(name="address",nullable = true)
     private String address;
 
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
@@ -62,6 +62,18 @@ public class Users implements Serializable {
         this.username = users.username;
         this.name = users.name;
         this.roles = users.roles;
+    }
+
+
+    public Users(UserApi userApi) {
+        this.active = userApi.getActive();
+        this.email = userApi.getEmail();
+        this.password = userApi.getPassword();
+        this.isVerified = userApi.getVerified();
+        this.username = userApi.getUsername();
+        this.name = userApi.getName();
+        this.address = userApi.getAddress();
+        this.phone = userApi.getPhone();
     }
 
     public int getId() {

@@ -11,7 +11,7 @@ public class Role implements Serializable {
     @Column(name = "roleId")
     private int roleId;
     @Column(name = "role_name")
-    private String role_name;
+    private String roleName;
 
     public Role() {
     }
@@ -25,10 +25,10 @@ public class Role implements Serializable {
     }
 
     public String getRoleName() {
-        return role_name;
+        return roleName;
     }
 
     public void setRoleName(String role) {
-        this.role_name = role;
+        this.roleName = role;
     }
 }

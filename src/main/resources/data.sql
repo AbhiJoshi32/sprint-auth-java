@@ -7,8 +7,14 @@ VALUES
 	'password,authorization_code,refresh_token', null, null, 36000, 36000, null, true);
 
 INSERT INTO users(
-	user_id, name, username, password, address, email, is_verified, phone, is_active)
-VALUES (1, 'abhi', 'john123', 123, 'India', 'aa@aa.aa', TRUE , 7777777777, 1);
+	user_id, name, username, password, address, email, is_verified, is_active)
+VALUES (1, 'anonymous', 'anonymous', 123, 'India', 'aa@aa.aa', TRUE , 1);
+
+INSERT INTO users(
+	user_id, name, username, password, address, email, is_verified, is_active)
+VALUES (2, 'admin', 'admin', 123, 'India', 'admin@binktec.com', TRUE , 1);
+
+
 INSERT INTO role(
 	role_id, role_name)
 VALUES (1, 'ADMIN');
@@ -21,5 +27,13 @@ INSERT INTO role(
 	role_id, role_name)
 VALUES (3, 'SHOP');
 
+
+INSERT INTO role(
+	role_id, role_name)
+VALUES (4, 'ANONYMOUS');
+
 INSERT INTO user_role(user_id,role_id)
-VALUES (1,2);
+VALUES (1,4);
+
+INSERT INTO user_role(user_id,role_id)
+VALUES (2,1);

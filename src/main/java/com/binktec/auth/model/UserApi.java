@@ -1,23 +1,17 @@
 package com.binktec.auth.model;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 public class UserApi {
-    @Column(name = "email")
     private String email;
-    @Column(name = "username")
     private String username;
-    @Column(name = "password")
     private String password;
-    @Column(name = "name")
     private String name;
-    @Column(name = "is_active")
     private int active;
-    @Column(name = "is_verified")
     private Boolean isVerified;
-    @Column(name="phone")
     private String phone;
-    @Column(name="address")
     private String address;
 
     public UserApi(Users users) {
@@ -29,6 +23,17 @@ public class UserApi {
         this.name = users.getName();
         this.address = users.getAddress();
         this.phone = users.getPhone();
+    }
+
+    public UserApi() {
+    }
+
+    public UserApi(String email, String username, String password, String name, int active) {
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.name = name;
+        this.active = active;
     }
 
     public String getEmail() {

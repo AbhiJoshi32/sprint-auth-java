@@ -85,7 +85,7 @@ CREATE TABLE if not exists users
   address character varying(255),
   email character varying(255),
   is_verified boolean,
-  phone character varying(12) NOT NULL,
+  phone character varying(12),
   is_active integer,
   CONSTRAINT user_pkey PRIMARY KEY (user_id)
 );
