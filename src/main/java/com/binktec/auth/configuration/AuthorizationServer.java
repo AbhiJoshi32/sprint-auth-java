@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
@@ -28,6 +27,8 @@ import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 @EnableAuthorizationServer
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
+
+    private final AuthenticationManager authenticationManager;
     @Value("classpath:schema.sql")
     private Resource schemaScript;
 
@@ -39,7 +40,8 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
     private final DataSource dataSource;
 
     @Autowired
-    public AuthorizationServer(@Qualifier("InitDataSource") DataSource dataSource, CustomerUserDetailService customerUserDetailService) {
+    public AuthorizationServer(@Qualifier("InitDataSource") DataSource dataSource, CustomerUserDetailService customerUserDetailService, AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
         this.dataSource = dataSource;
         this.customerUserDetailService = customerUserDetailService;
     }
@@ -61,6 +63,7 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
         endpoints.tokenStore(tokenStore())
 //                .accessTokenConverter(accessTokenConverter())
 //                .tokenEnhancer(tokenEnhancerChain)
+                .authenticationManager(authenticationManager)
                 .userDetailsService(customerUserDetailService);
     }
 
