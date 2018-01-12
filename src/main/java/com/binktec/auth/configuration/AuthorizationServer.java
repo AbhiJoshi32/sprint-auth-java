@@ -28,7 +28,6 @@ import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 @EnableAuthorizationServer
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
-    private final Environment env;
     @Value("classpath:schema.sql")
     private Resource schemaScript;
 
@@ -38,13 +37,10 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
     private final CustomerUserDetailService customerUserDetailService;
 
     private final DataSource dataSource;
-    private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public AuthorizationServer(@Qualifier("InitDataSource") DataSource dataSource, AuthenticationManager authenticationManager, Environment env, CustomerUserDetailService customerUserDetailService) {
+    public AuthorizationServer(@Qualifier("InitDataSource") DataSource dataSource, CustomerUserDetailService customerUserDetailService) {
         this.dataSource = dataSource;
-        this.authenticationManager = authenticationManager;
-        this.env = env;
         this.customerUserDetailService = customerUserDetailService;
     }
 
@@ -65,7 +61,7 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
         endpoints.tokenStore(tokenStore())
 //                .accessTokenConverter(accessTokenConverter())
 //                .tokenEnhancer(tokenEnhancerChain)
-                .authenticationManager(authenticationManager).userDetailsService(customerUserDetailService);
+                .userDetailsService(customerUserDetailService);
     }
 
     @Bean
