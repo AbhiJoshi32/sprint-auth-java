@@ -1,7 +1,8 @@
 package com.binktec.auth;
 
 import com.binktec.auth.model.Role;
-import com.binktec.auth.model.UserApi;
+import com.binktec.auth.model.RegisterUserApi;
+import com.binktec.auth.model.UserInfoApi;
 import com.binktec.auth.model.Users;
 import com.binktec.auth.repository.RoleRepository;
 import com.binktec.auth.repository.UserRepository;
@@ -28,16 +29,18 @@ public class RestApi {
     RoleRepository roleRepository;
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @RequestMapping("/user")
-    public UserApi user(Authentication authentication) {
+    public UserInfoApi user(Authentication authentication) {
         System.out.println(authentication.getName() + authentication.getAuthorities());
         Optional<Users> usersOptional = userRepository.findByUsername(authentication.getName());
-        return usersOptional.map(UserApi::new).orElse(null);
+        return usersOptional.map(UserInfoApi::new).orElse(null);
     }
 
     @PreAuthorize("hasRole('ROLE_ANONYMOUS') or hasRole('ROLE_ADMIN')" )
     @RequestMapping(method = RequestMethod.POST,value = "/register")
-    public ResponseEntity login(@RequestBody UserApi userApi) {
-        Users user = new Users(userApi);
+    public ResponseEntity login(@RequestBody RegisterUserApi registerUserApi) {
+        Users user = new Users(registerUserApi);
+        user.setVerified(false);
+        user.setActive(1);
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findByRoleName("USER"));
         user.setActive(1);
