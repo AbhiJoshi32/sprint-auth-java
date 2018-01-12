@@ -16,14 +16,21 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 @EnableResourceServer
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Override
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+
+    private CustomerUserDetailService customerUserDetailService;
+
 
     @Autowired
-    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    public WebSecurityConfig(CustomerUserDetailService customerUserDetailService, RestAuthenticationEntryPoint restAuthenticationEntryPoint) {
+        this.customerUserDetailService = customerUserDetailService;
+        this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(customerUserDetailService);
+    }
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
