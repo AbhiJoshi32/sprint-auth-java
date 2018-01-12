@@ -25,19 +25,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
-    private CustomerUserDetailService customerUserDetailService;
-
-
-    @Autowired
-    public WebSecurityConfig(CustomerUserDetailService customerUserDetailService) {
-        this.customerUserDetailService = customerUserDetailService;
-    }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(customerUserDetailService);
-    }
-
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
 		http.authorizeRequests()
