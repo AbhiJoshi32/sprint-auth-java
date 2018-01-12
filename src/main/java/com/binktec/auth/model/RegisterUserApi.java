@@ -4,36 +4,31 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-public class UserApi {
+public class RegisterUserApi {
     private String email;
     private String username;
     private String password;
     private String name;
-    private int active;
-    private Boolean isVerified;
     private String phone;
     private String address;
 
-    public UserApi(Users users) {
-        this.active = users.getActive();
+    public RegisterUserApi(Users users) {
         this.email = users.getEmail();
         this.password = users.getPassword();
-        this.isVerified = users.getVerified();
         this.username = users.getUsername();
         this.name = users.getName();
         this.address = users.getAddress();
         this.phone = users.getPhone();
     }
 
-    public UserApi() {
+    public RegisterUserApi() {
     }
 
-    public UserApi(String email, String username, String password, String name, int active) {
+    public RegisterUserApi(String email, String username, String password, String name) {
         this.email = email;
         this.username = username;
         this.password = password;
         this.name = name;
-        this.active = active;
     }
 
     public String getEmail() {
@@ -66,22 +61,6 @@ public class UserApi {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getActive() {
-        return active;
-    }
-
-    public void setActive(int active) {
-        this.active = active;
-    }
-
-    public Boolean getVerified() {
-        return isVerified;
-    }
-
-    public void setVerified(Boolean verified) {
-        isVerified = verified;
     }
 
     public String getPhone() {

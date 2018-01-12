@@ -65,15 +65,13 @@ public class Users implements Serializable {
     }
 
 
-    public Users(UserApi userApi) {
-        this.active = userApi.getActive();
-        this.email = userApi.getEmail();
-        this.password = userApi.getPassword();
-        this.isVerified = userApi.getVerified();
-        this.username = userApi.getUsername();
-        this.name = userApi.getName();
-        this.address = userApi.getAddress();
-        this.phone = userApi.getPhone();
+    public Users(RegisterUserApi registerUserApi) {
+        this.email = registerUserApi.getEmail();
+        this.password = registerUserApi.getPassword();
+        this.username = registerUserApi.getUsername();
+        this.name = registerUserApi.getName();
+        this.address = registerUserApi.getAddress();
+        this.phone = registerUserApi.getPhone();
     }
 
     public int getId() {
