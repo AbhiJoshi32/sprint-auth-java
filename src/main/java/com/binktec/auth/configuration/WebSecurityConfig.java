@@ -20,6 +20,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private CustomerUserDetailService customerUserDetailService;
 
+    @Override
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
     @Autowired
     public WebSecurityConfig(CustomerUserDetailService customerUserDetailService, RestAuthenticationEntryPoint restAuthenticationEntryPoint) {
