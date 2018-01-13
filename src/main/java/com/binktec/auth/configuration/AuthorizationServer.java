@@ -2,6 +2,7 @@ package com.binktec.auth.configuration;
 
 import javax.sql.DataSource;
 
+import com.binktec.auth.service.CustomerUserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,13 +28,14 @@ import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 @EnableAuthorizationServer
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
-    @Autowired
-    private Environment env;
+    private final Environment env;
     @Value("classpath:schema.sql")
     private Resource schemaScript;
 
     @Value("classpath:data.sql")
     private Resource dataScript;
+
+    private final CustomerUserDetailService customerUserDetailService;
 
 
     private final DataSource dataSource;
@@ -41,9 +43,11 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
     private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public AuthorizationServer(@Qualifier("InitDataSource") DataSource dataSource, AuthenticationManager authenticationManager) {
+    public AuthorizationServer(@Qualifier("InitDataSource") DataSource dataSource, AuthenticationManager authenticationManager, Environment env, CustomerUserDetailService customerUserDetailService) {
         this.dataSource = dataSource;
         this.authenticationManager = authenticationManager;
+        this.env = env;
+        this.customerUserDetailService = customerUserDetailService;
     }
 
     @Override
@@ -63,7 +67,8 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
         endpoints.tokenStore(tokenStore())
 //                .accessTokenConverter(accessTokenConverter())
 //                .tokenEnhancer(tokenEnhancerChain)
-                .authenticationManager(authenticationManager);
+                .authenticationManager(authenticationManager)
+                .userDetailsService(customerUserDetailService);
     }
 
     @Bean
