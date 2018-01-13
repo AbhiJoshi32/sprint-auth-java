@@ -6,6 +6,8 @@ import java.io.Serializable;
 @Entity
 @Table(name="role")
 public class Role implements Serializable {
+    @Transient
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "roleId")
