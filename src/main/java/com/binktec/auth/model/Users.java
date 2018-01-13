@@ -9,6 +9,7 @@ import java.util.Set;
 public class Users implements Serializable {
     @Transient
     private static final long serialVersionUID = 1L;
+
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id

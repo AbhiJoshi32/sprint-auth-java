@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
@@ -28,7 +27,8 @@ import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 @EnableAuthorizationServer
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
-    private final Environment env;
+    private final AuthenticationManager authenticationManager;
+
     @Value("classpath:schema.sql")
     private Resource schemaScript;
 
@@ -36,18 +36,14 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
     private Resource dataScript;
 
     private final CustomerUserDetailService customerUserDetailService;
-
-
     private final DataSource dataSource;
 
-    private final AuthenticationManager authenticationManager;
-
     @Autowired
-    public AuthorizationServer(@Qualifier("InitDataSource") DataSource dataSource, AuthenticationManager authenticationManager, Environment env, CustomerUserDetailService customerUserDetailService) {
+    public AuthorizationServer(@Qualifier("InitDataSource") DataSource dataSource, AuthenticationManager authenticationManager, CustomerUserDetailService customerUserDetailService) {
         this.dataSource = dataSource;
         this.authenticationManager = authenticationManager;
-        this.env = env;
         this.customerUserDetailService = customerUserDetailService;
+
     }
 
     @Override
