@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 @Entity
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 @Table(name = "users")
 public class Users implements Serializable {
     @Transient
@@ -31,7 +32,7 @@ public class Users implements Serializable {
     @Column(name="address",nullable = true)
     private String address;
 
-    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns =
     @JoinColumn(name="user_id"),inverseJoinColumns =
     @JoinColumn(name = "role_id"))

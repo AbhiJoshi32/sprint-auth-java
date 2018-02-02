@@ -35,14 +35,13 @@ public class RestApi {
         return usersOptional.map(UserInfoApi::new).orElse(null);
     }
 
-    @PreAuthorize("hasRole('ROLE_ANONYMOUS') or hasRole('ROLE_ADMIN')" )
     @RequestMapping(method = RequestMethod.POST,value = "/register")
     public ResponseEntity login(@RequestBody RegisterUserApi registerUserApi) {
         Users user = new Users(registerUserApi);
         user.setVerified(false);
         user.setActive(1);
         Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findByRoleName("USER"));
+        roles.add(roleRepository.findByRoleName("ANONYMOUS"));
         user.setActive(1);
         user.setRoles(roles);
         userRepository.save(user);

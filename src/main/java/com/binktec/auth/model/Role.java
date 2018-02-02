@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 @Table(name="role")
 public class Role implements Serializable {
     @Transient
@@ -16,6 +17,10 @@ public class Role implements Serializable {
     private String roleName;
 
     public Role() {
+    }
+
+    public Role(String rolename) {
+        this.roleName = rolename;
     }
 
     public int getRoleId() {
