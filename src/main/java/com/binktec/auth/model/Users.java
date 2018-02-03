@@ -4,8 +4,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
 
+@SuppressWarnings("ALL")
 @Entity
-@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
+@SequenceGenerator(name="seq", allocationSize=100)
 @Table(name = "users")
 public class Users implements Serializable {
     @Transient
@@ -27,9 +28,9 @@ public class Users implements Serializable {
     private int active;
     @Column(name = "is_verified")
     private Boolean isVerified;
-    @Column(name="phone",nullable = true)
+    @Column(name="phone")
     private String phone;
-    @Column(name="address",nullable = true)
+    @Column(name="address")
     private String address;
 
     @ManyToMany(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
@@ -76,6 +77,8 @@ public class Users implements Serializable {
         this.name = registerUserApi.getName();
         this.address = registerUserApi.getAddress();
         this.phone = registerUserApi.getPhone();
+        this.setVerified(false);
+        this.setActive(1);
     }
 
     public int getId() {

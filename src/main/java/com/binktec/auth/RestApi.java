@@ -1,50 +1,72 @@
 package com.binktec.auth;
 
-import com.binktec.auth.model.Role;
+import com.binktec.auth.Exception.BadTokenException;
+import com.binktec.auth.Exception.EmailExistsException;
+import com.binktec.auth.Exception.UsernameExistsException;
 import com.binktec.auth.model.RegisterUserApi;
 import com.binktec.auth.model.UserInfoApi;
 import com.binktec.auth.model.Users;
-import com.binktec.auth.repository.RoleRepository;
-import com.binktec.auth.repository.UserRepository;
+import com.binktec.auth.model.VerificationToken;
+import com.binktec.auth.registration.OnRegistrationCompleteEvent;
+import com.binktec.auth.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.Calendar;
 
 @RestController
 @RequestMapping("/")
 public class RestApi {
+    private final IUserService service;
+    private final
+    ApplicationEventPublisher eventPublisher;
+
     @Autowired
-    UserRepository userRepository;
-    @Autowired
-    RoleRepository roleRepository;
+    public RestApi(IUserService service, ApplicationEventPublisher eventPublisher) {
+        this.service = service;
+        this.eventPublisher = eventPublisher;
+    }
+
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @RequestMapping("/user")
-    public UserInfoApi user(Authentication authentication) {
-        System.out.println(authentication.getName() + authentication.getAuthorities());
-        Optional<Users> usersOptional = userRepository.findByUsername(authentication.getName());
-        return usersOptional.map(UserInfoApi::new).orElse(null);
+    public UserInfoApi user(Authentication authentication) throws UsernameNotFoundException{
+        return new UserInfoApi(service.getUserByUsername(authentication.getName()));
     }
 
     @RequestMapping(method = RequestMethod.POST,value = "/register")
-    public ResponseEntity login(@RequestBody RegisterUserApi registerUserApi) {
-        Users user = new Users(registerUserApi);
-        user.setVerified(false);
-        user.setActive(1);
-        Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findByRoleName("ANONYMOUS"));
-        user.setActive(1);
-        user.setRoles(roles);
-        userRepository.save(user);
+    public ResponseEntity login(@RequestBody RegisterUserApi registerUserApi,WebRequest request) throws EmailExistsException, UsernameExistsException{
+        Users users = service.registerNewUserAccount(registerUserApi);
+        String appUrl = request.getContextPath();
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent
+                (users, request.getLocale(), appUrl));
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/register/confirm", method = RequestMethod.GET)
+    public UserInfoApi confirmRegistration
+            (@RequestParam("token") String token) throws BadTokenException{
+
+        VerificationToken verificationToken = service.getVerificationToken(token);
+        if (verificationToken == null) {
+            throw new BadTokenException();
+        }
+
+        Users user = verificationToken.getUser();
+        Calendar cal = Calendar.getInstance();
+        if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
+            throw new BadTokenException();
+        }
+
+        user.setVerified(true);
+        service.saveRegisteredUser(user);
+        return new UserInfoApi(user);
+
     }
 }

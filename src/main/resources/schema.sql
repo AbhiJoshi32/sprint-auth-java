@@ -1,7 +1,4 @@
 drop table if exists oauth_client_details;
-drop TABLE IF EXISTS user_role;
-drop TABLE if EXISTS users;
-drop TABLE IF EXISTS role;
 
 create table oauth_client_details (
   client_id VARCHAR(255) PRIMARY KEY,
