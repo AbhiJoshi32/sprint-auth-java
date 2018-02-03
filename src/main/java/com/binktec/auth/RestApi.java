@@ -44,9 +44,13 @@ public class RestApi {
     public ResponseEntity login(@RequestBody RegisterUserApi registerUserApi,WebRequest request) throws EmailExistsException, UsernameExistsException{
         Users users = service.registerNewUserAccount(registerUserApi);
         String appUrl = request.getContextPath();
-        eventPublisher.publishEvent(new OnRegistrationCompleteEvent
-                (users, request.getLocale(), appUrl));
-        return ResponseEntity.ok(HttpStatus.OK);
+        try {
+            eventPublisher.publishEvent(new OnRegistrationCompleteEvent
+                    (users, request.getLocale(), appUrl));
+            return ResponseEntity.ok(HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.ok(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @RequestMapping(value = "/register/confirm", method = RequestMethod.GET)
