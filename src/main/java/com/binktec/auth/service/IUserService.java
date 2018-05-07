@@ -12,13 +12,11 @@ public interface IUserService {
     Users registerNewUserAccount(RegisterUserApi accountDto)
             throws EmailExistsException, UsernameExistsException;
 
-    Users getUser(String verificationToken);
-
-    void saveRegisteredUser(Users user);
-
     void createVerificationToken(Users user, String token);
 
     VerificationToken getVerificationToken(String VerificationToken);
 
     Users getUserByUsername(String name) throws UsernameNotFoundException;
+
+    Users verifyUser(VerificationToken verificationToken);
 }

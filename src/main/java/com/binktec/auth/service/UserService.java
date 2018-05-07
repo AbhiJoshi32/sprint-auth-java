@@ -8,6 +8,7 @@ import com.binktec.auth.repository.UserRepository;
 import com.binktec.auth.repository.VerificationTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -18,14 +19,18 @@ import java.util.Set;
 @Service
 @Transactional
 public class UserService implements IUserService {
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final VerificationTokenRepository verificationTokenRepository;
 
     @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private VerificationTokenRepository tokenRepository;
+    public UserService(RoleRepository roleRepository, UserRepository userRepository, VerificationTokenRepository verificationTokenRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.roleRepository  = roleRepository;
+        this.userRepository = userRepository;
+        this.verificationTokenRepository = verificationTokenRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
 
     @Override
     public Users registerNewUserAccount(RegisterUserApi registerUserApi)
@@ -38,6 +43,7 @@ public class UserService implements IUserService {
             throw new UsernameExistsException();
         }
         Users user = new Users(registerUserApi);
+        user.setPassword(bCryptPasswordEncoder.encode(registerUserApi.getPassword()));
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findByRoleName("ANONYMOUS"));
         user.setActive(1);
@@ -56,13 +62,8 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Users getUser(String verificationToken) {
-        return tokenRepository.findByToken(verificationToken).getUser();
-    }
-
-    @Override
     public VerificationToken getVerificationToken(String VerificationToken) {
-        return tokenRepository.findByToken(VerificationToken);
+        return verificationTokenRepository.findByToken(VerificationToken);
     }
 
     @Override
@@ -72,13 +73,21 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void saveRegisteredUser(Users user) {
+    public Users verifyUser(VerificationToken verificationToken) {
+        verificationTokenRepository.delete(verificationToken);
+        Users user = verificationToken.getUser();
+        user.setVerified(true);
+        Set<Role> roles = user.getRoles();
+        roles.removeIf(role -> role.getRoleName().equals("ANONYMOUS"));
+        roles.add(roleRepository.findByRoleName("USER"));
+        user.setRoles(roles);
         userRepository.save(user);
+        return user;
     }
 
     @Override
     public void createVerificationToken(Users user, String token) {
         VerificationToken myToken = new VerificationToken(token, user);
-        tokenRepository.save(myToken);
+        verificationTokenRepository.save(myToken);
     }
 }

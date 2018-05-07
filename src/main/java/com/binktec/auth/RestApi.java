@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
@@ -34,14 +33,13 @@ public class RestApi {
         this.eventPublisher = eventPublisher;
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @RequestMapping("/user")
     public UserInfoApi user(Authentication authentication) throws UsernameNotFoundException{
         return new UserInfoApi(service.getUserByUsername(authentication.getName()));
     }
 
     @RequestMapping(method = RequestMethod.POST,value = "/register")
-    public ResponseEntity login(@RequestBody RegisterUserApi registerUserApi,WebRequest request) throws EmailExistsException, UsernameExistsException{
+    public ResponseEntity register(@RequestBody RegisterUserApi registerUserApi,WebRequest request) throws EmailExistsException, UsernameExistsException{
         Users users = service.registerNewUserAccount(registerUserApi);
         String appUrl = request.getContextPath();
         try {
@@ -61,16 +59,12 @@ public class RestApi {
         if (verificationToken == null) {
             throw new BadTokenException();
         }
-
-        Users user = verificationToken.getUser();
         Calendar cal = Calendar.getInstance();
         if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
             throw new BadTokenException();
         }
 
-        user.setVerified(true);
-        service.saveRegisteredUser(user);
+        Users user = service.verifyUser(verificationToken);
         return new UserInfoApi(user);
-
     }
 }

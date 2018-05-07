@@ -38,6 +38,8 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
     private final CustomerUserDetailService customerUserDetailService;
     private final DataSource dataSource;
 
+    @Autowired BCryptPasswordEncoder passwordEncoder;
+
     @Autowired
     public AuthorizationServer(@Qualifier("InitDataSource") DataSource dataSource, AuthenticationManager authenticationManager, CustomerUserDetailService customerUserDetailService) {
         this.dataSource = dataSource;
@@ -53,7 +55,8 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
 
     @Override
     public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.jdbc(dataSource).passwordEncoder(passwordEncoder ());
+        clients.jdbc(dataSource)
+                .passwordEncoder(passwordEncoder);
     }
 
     @Override
@@ -95,10 +98,5 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
     @Bean
     public TokenStore tokenStore() {
         return new JdbcTokenStore(dataSource);
-    }
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder () {
-        return new BCryptPasswordEncoder();
     }
 }
